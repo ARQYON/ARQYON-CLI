@@ -1,270 +1,168 @@
 # ARQYON CLI
+**A C++ Powered Developer & System Toolkit with C# Host and Python Extensibility**
 
-```
-  █████╗ ██████╗  ██████╗ ██╗   ██╗ ██████╗ ███╗   ██╗
- ██╔══██╗██╔══██╗██╔═══██╗╚██╗ ██╔╝██╔═══██╗████╗  ██║
- ███████║██████╔╝██║   ██║ ╚████╔╝ ██║   ██║██╔██╗ ██║
- ██╔══██║██╔══██╗██║▄▄ ██║  ╚██╔╝  ██║   ██║██║╚██╗██║
- ██║  ██║██║  ██║╚██████╔╝   ██║   ╚██████╔╝██║ ╚████║
- ╚═╝  ╚═╝╚═╝  ╚═╝ ╚══▀▀═╝   ╚═╝    ╚═════╝ ╚═╝  ╚═══╝
-```
-
-> **Think Beyond. Build Without Limits.**
-
-A unified, polyglot command-line toolkit. Fast system inspection, developer
-environment detection, file utilities, diagnostics, and Python-powered
-automation — all in one binary.
+> Think Beyond. Build Without Limits. — ARQYON
 
 ---
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────┐
-│          C# Shell  (arqyon.exe)             │  ← User-facing CLI
-│   Command routing · Output formatting       │
-└────────────────┬────────────────────────────┘
-                 │  P/Invoke (Native DLL)
-┌────────────────▼────────────────────────────┐
-│       C++ Core  (arqyon_core.dll)           │  ← Speed + system access
-│  System · Dev · File · Diagnostics          │
-└────────────────┬────────────────────────────┘
-                 │  Python C API / shell-out
-┌────────────────▼────────────────────────────┐
-│        Python Layer  (automation/)          │  ← Extensibility
-│   Plugins · Automation · runner_api         │
-└─────────────────────────────────────────────┘
+arqyon.exe  (C# .NET 10 — host, TUI, command routing)
+     │
+     ├── P/Invoke ──► ArqyonNative.dll  (C++17 — OS, hashing, detection)
+     │
+     └── Subprocess ──► plugins/*.py    (Python 3 — automation scripts)
 ```
 
-**Why three languages?**
-
-| Layer | Language | Reason |
+| Layer | Language | Responsibility |
 |---|---|---|
-| Core | C++ | Windows API, hashing, raw speed |
-| Shell | C# | Cross-platform CLI UX, .NET ecosystem |
-| Automation | Python | Scriptability, extensibility, rapid plugins |
+| Host | C# .NET 10 | Entry point, Spectre.Console TUI, command dispatch |
+| Native | C++17 (DLL) | Windows API, system info, file hashing, diagnostics |
+| Plugins | Python 3 | User automation, scripting, extensibility |
 
-**Inter-layer communication:** C++ compiles to `arqyon_core.dll`. C# calls it
-via P/Invoke (`[DllImport]`). Every `char*` returned from C++ is freed with
-`FreeCoreString()` — the memory contract is enforced in `ArqyonCore.cs`.
+---
+
+## Commands
+
+```powershell
+arqyon --help
+arqyon --version
+
+arqyon system                     # CPU, RAM, OS, uptime
+arqyon system --disk              # + disk usage on C:\
+arqyon system --disk --drive D:\  # specific drive
+
+arqyon dev                        # detected tools
+arqyon dev --all                  # include not-found tools
+
+arqyon hash <file>                # MD5 + SHA-256
+arqyon hash <file> -a sha256      # SHA-256 only
+arqyon hash <file> -a md5         # MD5 only
+
+arqyon doctor                     # environment health check
+
+arqyon run --list                 # list plugins
+arqyon run <plugin>               # run a plugin
+arqyon run cleanup C:\Projects    # run with args
+```
+
+---
+
+## Build
+
+**Prerequisites:** Visual Studio 2022 (C++), CMake 3.20+, .NET 10 SDK, Python 3
+
+```powershell
+# From the arqyon-cli/ directory:
+
+.\build.ps1               # Release build
+.\build.ps1 -Config Debug # Debug build
+.\build.ps1 -Clean        # Clean + rebuild
+```
+
+**Manual build:**
+```powershell
+# 1. Build C++ DLL
+cd ArqyonNative
+cmake -S . -B build
+cmake --build build --config Release
+
+# 2. Build C# exe
+cd ../ArqyonCLI
+dotnet build -c Release
+```
+
+---
+
+## Run and Test Your CLI
+
+After a successful Release build, run these commands from the project root in PowerShell:
+
+```powershell
+.\ArqyonCLI\bin\Release\net10.0\arqyon.exe --help
+.\ArqyonCLI\bin\Release\net10.0\arqyon.exe system
+```
+
+The `system` command displays the ARQYON banner and your computer's OS, hostname, user, CPU, core count, RAM, and uptime.
+
+To use the shorter `arqyon` command, add the build output directory to `PATH` for the current PowerShell session:
+
+```powershell
+# Run from the project root.
+$env:Path += ";$PWD\ArqyonCLI\bin\Release\net10.0"
+
+arqyon system
+arqyon system --disk
+arqyon system --disk --drive D:\
+```
+
+Use a drive that exists on your computer. This `PATH` change lasts only until you close the PowerShell session; repeat it in a new session or use the executable path directly. If `arqyon` is not recognized, check that the Release build succeeded and that you added the correct directory.
+
+For a Debug build, replace `Release` with `Debug` in the paths above. Keep `ArqyonNative.dll` beside `arqyon.exe` in the output directory; the build copies it there automatically. Running the built CLI requires the .NET 10 runtime, which is also included with the .NET 10 SDK.
+
+---
+
+## Writing a Plugin
+
+Place any `.py` file in the `plugins/` directory next to `arqyon.exe`.
+
+```python
+# plugins/my_plugin.py
+import sys
+
+def main():
+    args = sys.argv[1:]
+    print(f"Hello from ARQYON! Args: {args}")
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())
+```
+
+Run it with: `arqyon run my_plugin`
 
 ---
 
 ## Project Structure
 
 ```
-arqyon/
-├── core/                        C++ DLL (arqyon_core)
+arqyon-cli/
+├── ArqyonNative/           ← C++17 DLL
 │   ├── include/
-│   │   ├── arqyon_exports.h     DLL contract — all exported symbols
-│   │   ├── system_info.h
-│   │   ├── dev_tools.h
-│   │   ├── file_utils.h
-│   │   ├── diagnostics.h
-│   │   └── py_runner.h
+│   │   └── arqyon_native.h
 │   ├── src/
-│   │   ├── exports.cpp          DLL entry + all C exports
-│   │   ├── system_info.cpp      CPU · RAM · OS · Disk (Windows API)
-│   │   ├── dev_tools.cpp        Language detection · PATH scan
-│   │   ├── file_utils.cpp       SHA-256 · MD5 · file metadata (CNG)
-│   │   ├── diagnostics.cpp      Full diagnostic report
-│   │   └── py_runner.cpp        Embedded Python runner
+│   │   ├── sys_info.cpp
+│   │   ├── disk_info.cpp
+│   │   ├── dev_detect.cpp
+│   │   ├── file_hash.cpp
+│   │   └── diagnostics.cpp
 │   └── CMakeLists.txt
-│
-├── shell/                       C# CLI shell
+├── ArqyonCLI/              ← C# .NET 10 host
 │   ├── Commands/
-│   │   ├── SystemCommand.cs     arqyon system
-│   │   ├── DevCommand.cs        arqyon dev
-│   │   ├── FileCommand.cs       arqyon file
-│   │   ├── DiagCommand.cs       arqyon diag
-│   │   └── RunCommand.cs        arqyon run / plugin
-│   ├── Interop/
-│   │   └── ArqyonCore.cs        P/Invoke bridge (all DllImport)
-│   ├── Output/
-│   │   ├── Printer.cs           Tables · colors · banners
-│   │   └── JsonExporter.cs      JSON / HTML report export
-│   ├── Program.cs               Entry point + command router
-│   └── ArqyonShell.csproj
-│
-├── automation/                  Python layer
-│   ├── plugins/
-│   │   └── hello_plugin.py      Example plugin
-│   └── runner_api.py            Plugin base class + helpers
-│
-├── CMakeLists.txt               Root CMake
-├── build.ps1                    One-shot build script (PowerShell)
+│   │   ├── SystemCommand.cs
+│   │   ├── DevCommand.cs
+│   │   ├── HashCommand.cs
+│   │   ├── DoctorCommand.cs
+│   │   └── RunCommand.cs
+│   ├── Core/
+│   │   ├── NativeBridge.cs
+│   │   ├── OutputRenderer.cs
+│   │   └── PythonBridge.cs
+│   ├── Program.cs
+│   └── ArqyonCLI.csproj
+├── plugins/                ← Python automation
+│   ├── example_plugin.py
+│   └── cleanup.py
+├── build.ps1               ← One-shot build
+├── CMakeLists.txt
 └── README.md
 ```
 
 ---
 
-## Prerequisites
-
-| Tool | Minimum Version | Purpose |
-|---|---|---|
-| Visual Studio / MSVC | 2022 | Compile C++ core |
-| CMake | 3.20 | C++ build system |
-| .NET SDK | 8.0 | Build C# shell |
-| Python 3 | 3.8+ | Automation layer (optional for embedding) |
-
----
-
-## Building
-
-### Quick build (PowerShell)
-
-```powershell
-.\build.ps1
-# or for Debug:
-.\build.ps1 -Config Debug
-```
-
-This will:
-1. Run CMake to configure and build `arqyon_core.dll`
-2. Run `dotnet build` on the C# shell
-3. Copy the DLL into the shell's output directory
-
-### Manual build
-
-**Step 1 — C++ core:**
-```powershell
-cmake -S . -B build
-cmake --build build --config Release
-```
-
-**Step 2 — C# shell:**
-```powershell
-cd shell
-dotnet build -c Release
-```
-
-**Step 3 — Copy DLL:**
-```powershell
-copy build\bin\Release\arqyon_core.dll shell\bin\Release\net8.0\win-x64\
-```
-
-### Optional: Embedded Python
-
-To enable the Python C API (faster script execution, no subprocess):
-
-1. Install Python 3 with the development headers.
-2. In `core/CMakeLists.txt`, uncomment the `find_package(Python3 ...)` block.
-3. Rebuild the core.
-
-Without this, `arqyon run` falls back to shelling out to the system `python`.
-
----
-
-## Usage
-
-```powershell
-arqyon --help
-arqyon --version
-
-# System information
-arqyon system              # All: OS + CPU + RAM + Disk
-arqyon system cpu          # CPU only
-arqyon system ram          # Memory only
-arqyon system os           # OS details only
-arqyon system disk         # Storage drives
-
-# Developer environment
-arqyon dev langs           # Detect installed runtimes (Node, Python, Go…)
-arqyon dev env             # Inspect PATH entries
-arqyon dev doctor          # Health check for essential tools
-
-# File utilities
-arqyon file hash <path>           # SHA-256 hash
-arqyon file hash <path> --md5     # MD5 hash
-arqyon file info <path>           # Metadata: size, timestamps, attributes
-
-# Diagnostics
-arqyon diag                       # Full report (inline)
-arqyon diag --export              # Save as JSON
-arqyon diag --export --html       # Save as HTML report
-arqyon diag --export --out report.json   # Custom output path
-
-# Python automation
-arqyon run <script.py>            # Run a Python script
-arqyon run <script.py> arg1 arg2  # With arguments
-arqyon plugin list                # List installed plugins
-```
-
----
-
-## Writing a Plugin
-
-Create a `.py` file in `automation/plugins/`:
-
-```python
-# automation/plugins/my_plugin.py
-import sys
-sys.path.insert(0, "automation")   # so runner_api is importable
-from runner_api import ArqyonPlugin, log, success
-
-class MyPlugin(ArqyonPlugin):
-    name        = "my-plugin"
-    version     = "1.0.0"
-    description = "Does something useful."
-
-    def run(self, args):
-        log("Starting...")
-        # your logic here
-        success("Done.")
-        return 0
-
-if __name__ == "__main__":
-    MyPlugin().execute()
-```
-
-Run it:
-```powershell
-arqyon run automation/plugins/my_plugin.py
-```
-
----
-
-## Memory Contract (C++ ↔ C#)
-
-Every function in `arqyon_exports.h` that returns `char*` heap-allocates the
-string with `new char[]`. The C# side **must** free it via `FreeCoreString()`.
-This is handled transparently in `ArqyonCore.cs` — the `MarshalAndFree()`
-helper converts to a managed `string` and immediately frees the native pointer.
-Consumers never touch raw `IntPtr`.
-
-```
-C++ → char* (new[])
-       ↓
-C# → MarshalAndFree(ptr)
-       ├── Marshal.PtrToStringAnsi(ptr)   → managed string
-       └── FreeCoreString(ptr)            → delete[] ptr
-```
-
----
-
-## Extending ARQYON
-
-### Add a new C++ module
-
-1. Create `core/include/my_module.h` and `core/src/my_module.cpp`
-2. Add exported functions to `core/include/arqyon_exports.h`
-3. Implement the exports in `core/src/exports.cpp`
-4. Add P/Invoke declarations in `shell/Interop/ArqyonCore.cs`
-5. Add a command class in `shell/Commands/MyCommand.cs`
-6. Register the command in `shell/Program.cs`
-
-### Add a new CLI command
-
-1. Create `shell/Commands/MyCommand.cs` following the pattern of existing commands
-2. Add the case to the `switch` in `Program.cs`
-3. Add a help entry in `ShowHelp()`
-
----
+## Organization
+**ARQYON** — Think Beyond. Build Without Limits.
 
 ## License
-
-MIT License — Copyright © 2025 ARQYON
-
----
-
-*ARQYON — Think Beyond. Build Without Limits.*
+MIT License

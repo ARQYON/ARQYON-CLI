@@ -1,20 +1,62 @@
-# CMake build output
-/build/
+# .NET build and publish output
+[Bb]in/
+[Oo]bj/
+artifacts/
+TestResults/
 
-# .NET build output
-/shell/bin/
-/shell/obj/
+# CMake build output and local configuration
+build/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+install_manifest.txt
+CMakeUserPresets.json
 
-# Python-generated files and virtual environments
+# Native compiler and linker artifacts
+*.obj
+*.o
+*.pdb
+*.ilk
+*.exp
+*.lib
+*.dll
+*.exe
+*.pch
+*.idb
+*.tlog
+*.lastbuildstate
+
+# Visual Studio and user-specific IDE settings
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Python caches and virtual environments
 __pycache__/
 *.py[cod]
 .venv/
 venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
-# Visual Studio user-specific files
-.vs/
-*.suo
-*.user
+# Local environment files (keep example configuration)
+.env
+.env.*
+!.env.example
+!.env.sample
 
-# Local CMake configuration
-CMakeUserPresets.json
+# Temporary and operating system files
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+.DS_Store
+Thumbs.db
+Desktop.ini
