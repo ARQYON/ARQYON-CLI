@@ -41,7 +41,7 @@ internal sealed class SystemCommand : Command<SystemCommand.Settings>
         if (s.ShowDisk)
         {
             OutputRenderer.Blank();
-            OutputRenderer.Section($"Disk — {s.Drive}");
+            OutputRenderer.Section($"Disk - {s.Drive}");
             long total = NativeBridge.DiskTotalGb(s.Drive);
             long free  = NativeBridge.DiskFreeGb(s.Drive);
             if (total < 0)

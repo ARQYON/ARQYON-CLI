@@ -1,0 +1,38 @@
+ARQYON Code Use License and Repository Contribution Policy
+
+Copyright (c) 2026 ARQYON
+
+1. Permission to use the code
+
+Permission is granted, free of charge, to anyone obtaining a copy of this
+software and its documentation to view, study, copy, run, use, modify, and
+redistribute the software, including for personal and commercial purposes,
+provided this copyright notice and these terms are retained in all copies
+or substantial portions of the software.
+
+2. Official repository and contributions
+
+The official repository is https://github.com/ARQYON/ARQYON-CLI.
+Only the owner, or people explicitly authorized by the owner, may push
+commits, merge changes, or otherwise modify the official repository.
+Permission to use this code does not grant write access to that repository.
+External code contributions are not accepted unless the owner invites or
+approves them in advance.
+
+This repository policy does not prohibit local commits or changes in a
+user's own copy or fork. Repository write restrictions must also be enforced
+through the hosting service's access controls.
+
+3. Ownership and third-party components
+
+Ownership of the original code remains with its copyright holder. This
+license does not grant trademark rights or permission to imply endorsement
+by ARQYON. Third-party components remain subject to their own licenses.
+
+4. Disclaimer
+
+The software is provided "as is", without warranties of any kind, express
+or implied, including warranties of merchantability, fitness for a
+particular purpose, and noninfringement. To the extent permitted by law,
+the copyright holder is not liable for claims, damages, or other liability
+arising from the software or its use.

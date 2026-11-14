@@ -1,5 +1,5 @@
 """
-example_plugin.py — ARQYON Plugin Example
+example_plugin.py - ARQYON Plugin Example
 
 Every ARQYON plugin is a plain Python script.
   • Receives CLI args via sys.argv[1:]

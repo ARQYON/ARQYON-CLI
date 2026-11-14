@@ -10,7 +10,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Version>1.0.0</Version>
     <Authors>ARQYON</Authors>
-    <Description>ARQYON CLI — Developer and System Toolkit</Description>
+    <Description>ARQYON CLI - Developer and System Toolkit</Description>
   </PropertyGroup>
 
   <ItemGroup>

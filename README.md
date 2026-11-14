@@ -1,18 +1,18 @@
 # ARQYON CLI
 **A C++ Powered Developer & System Toolkit with C# Host and Python Extensibility**
 
-> Think Beyond. Build Without Limits. — ARQYON
+> Think Beyond. Build Without Limits. - ARQYON
 
 ---
 
 ## Architecture
 
 ```
-arqyon.exe  (C# .NET 10 — host, TUI, command routing)
+arqyon.exe  (C# .NET 10 - host, TUI, command routing)
      │
-     ├── P/Invoke ──► ArqyonNative.dll  (C++17 — OS, hashing, detection)
+     ├── P/Invoke ──► ArqyonNative.dll  (C++17 - OS, hashing, detection)
      │
-     └── Subprocess ──► plugins/*.py    (Python 3 — automation scripts)
+     └── Subprocess ──► plugins/*.py    (Python 3 - automation scripts)
 ```
 
 | Layer | Language | Responsibility |
@@ -162,7 +162,9 @@ arqyon-cli/
 ---
 
 ## Organization
-**ARQYON** — Think Beyond. Build Without Limits.
+**ARQYON** - Think Beyond. Build Without Limits.
 
 ## License
-MIT License
+See [LICENSE](LICENSE) for the ARQYON Code Use License and Repository Contribution Policy.
+
+Anyone may view and use the code under those terms. Changes to the official repository require the owner's explicit permission; external code contributions are accepted only by prior invitation or approval. This does not prevent local commits in your own copy or fork.

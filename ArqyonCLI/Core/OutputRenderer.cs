@@ -3,7 +3,7 @@ using Spectre.Console;
 namespace ArqyonCLI.Core;
 
 /// <summary>
-/// Centralized Spectre.Console rendering helpers — keeps all styling in one place.
+/// Centralized Spectre.Console rendering helpers - keeps all styling in one place.
 /// </summary>
 internal static class OutputRenderer
 {

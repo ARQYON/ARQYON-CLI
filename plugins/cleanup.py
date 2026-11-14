@@ -1,5 +1,5 @@
 """
-cleanup.py — ARQYON Automation Plugin
+cleanup.py - ARQYON Automation Plugin
 
 Finds and reports (or deletes) common junk files:
   __pycache__, *.pyc, .DS_Store, Thumbs.db, *.tmp, *.log
